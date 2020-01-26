@@ -1,6 +1,7 @@
 from openpyxl import load_workbook
 import random
 import datetime
+from logger.logging import log
 
 # Constants
 HEADER_ROW = 1
@@ -31,7 +32,7 @@ def normalize(weights):
 
 
 def weighted_choice(seq, weights):
-    print('Seq Length: {1}, Weight Length: {0}, Probability Dist: {2}'.format(len(weights), len(seq), 1. - sum(weights)))
+    log.info('Seq Length: {1}, Weight Length: {0}, Probability Dist: {2}'.format(len(weights), len(seq), 1. - sum(weights)))
     assert len(weights) == len(seq)
     assert abs(1. - sum(weights)) < 1e-6
 
@@ -50,11 +51,10 @@ def get_hashtags(count, weighted=False):
         for i in range(START_COL, END_COL, STEP):
             r = ws.cell(row=HASHTAGS_IN_COL_ROW, column=i).value
             num = ws.cell(row=HASHTAGS_TO_USE_ROW, column=i).value
-            # print('Getting {0} hashtags out of {1}'.format(num, r))
 
             tempHashtags = []
             tempWeight = []
-            print('Number to pick: {0}, Rows: {1}'.format(num, r))
+            log.info('Number to pick: {0}, Rows: {1}'.format(num, r))
             for j in range(START_ROW, START_ROW+r):
                 tempHashtags.append(ws.cell(row=j, column=i).value)
                 tempWeight.append(ws.cell(row=j, column=i+1).value)
@@ -82,8 +82,6 @@ def get_hashtags(count, weighted=False):
         file = open('{0}_{1}.{2}'.format(FILENAME, datetime.date.today(), FILE_EXT), 'a')
         file.write(hashtag)
         file.close()
-
-        print(hashtag)
 
 
 wb = load_workbook('hashtags.xlsx', data_only=True)
