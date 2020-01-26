@@ -1,7 +1,9 @@
 from openpyxl import load_workbook
 import random
 import datetime
+import sys
 from logger.logging import log
+import arguments.argumentParser as parser
 
 # Constants
 HEADER_ROW = 1
@@ -32,7 +34,7 @@ def normalize(weights):
 
 
 def weighted_choice(seq, weights):
-    log.info('Seq Length: {1}, Weight Length: {0}, Probability Dist: {2}'.format(len(weights), len(seq), 1. - sum(weights)))
+    log.debug('Seq Length: {1}, Weight Length: {0}, Probability Dist: {2}'.format(len(weights), len(seq), 1. - sum(weights)))
     assert len(weights) == len(seq)
     assert abs(1. - sum(weights)) < 1e-6
 
@@ -43,8 +45,12 @@ def weighted_choice(seq, weights):
         x -= weights[i]
 
 
-def get_hashtags(count, weighted=False):
-    assert count != 1
+def get_hashtags(count, weighted=False, filename=FILENAME):
+    assert count != 0
+
+    # open the file to write to and empty it's current contents
+    file = open('{0}_{1}.{2}'.format(filename, datetime.date.today(), FILE_EXT), 'a')
+    file.truncate(0)
 
     for m in range(0, count):
         hashtags = []
@@ -54,7 +60,7 @@ def get_hashtags(count, weighted=False):
 
             tempHashtags = []
             tempWeight = []
-            log.info('Number to pick: {0}, Rows: {1}'.format(num, r))
+            log.debug('Number to pick: {0}, Rows: {1}'.format(num, r))
             for j in range(START_ROW, START_ROW+r):
                 tempHashtags.append(ws.cell(row=j, column=i).value)
                 tempWeight.append(ws.cell(row=j, column=i+1).value)
@@ -78,13 +84,14 @@ def get_hashtags(count, weighted=False):
                     tempWeight.pop(tagIndex)
 
         hashtag = '\n{0}\n{0}\n{0}\n'.format(SPACER) + ' '.join(map(str, hashtags))
-
-        file = open('{0}_{1}.{2}'.format(FILENAME, datetime.date.today(), FILE_EXT), 'a')
         file.write(hashtag)
-        file.close()
+
+    file.close()
 
 
-wb = load_workbook('hashtags.xlsx', data_only=True)
+appName = sys.argv[0]
+args = parser.ArgsParser().parse(sys.argv[1:])
+wb = load_workbook(args.workbook, data_only=True)
 ws = wb[SHEET_NAME]
-get_hashtags(100, True)
+get_hashtags(args.iterations, args.weight, args.filename)
 

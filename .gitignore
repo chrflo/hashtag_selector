@@ -4,3 +4,5 @@
 venv/
 
 logger/__pycache__/
+
+logs/
