@@ -2,7 +2,7 @@ from openpyxl import load_workbook
 import random
 import datetime
 import sys
-from logger.logging import log
+import logger.logging as logger
 import arguments.argumentParser as parser
 
 # Constants
@@ -91,6 +91,12 @@ def get_hashtags(count, weighted=False, filename=FILENAME):
 
 appName = sys.argv[0]
 args = parser.ArgsParser().parse(sys.argv[1:])
+
+# init logging
+
+global log
+log = logger.Logger(args.logLvl, args.logName, args.logPath).logger
+
 wb = load_workbook(args.workbook, data_only=True)
 ws = wb[SHEET_NAME]
 get_hashtags(args.iterations, args.weight, args.filename)

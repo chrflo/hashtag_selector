@@ -16,6 +16,8 @@ class ArgsParser:
                             help="number of times to generate a hashtag set", type=int, required=False)
         self.parser.add_argument("-lp", "--logPath", dest="logPath", default='logs',
                             help="the path of the log files", type=str, required=False)
+        self.parser.add_argument("-ln", "--logName", dest="logName", default='hashtag_logs',
+                            help="the name of the log file", type=str, required=False)
 
     def parse(self, args):
         return self.parser.parse_args(args)

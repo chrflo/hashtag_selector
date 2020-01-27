@@ -6,3 +6,5 @@ venv/
 logger/__pycache__/
 
 logs/
+
+arguments/__pycache__/
